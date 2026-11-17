@@ -14,7 +14,7 @@ import java.util.Map;
 
 
 public class ChessPiece {
-    private String name = "";      // "king", "queen", "rook", "bishop", "knight", "pawn"
+    private String name = ""; // "king", "queen", "rook", "bishop", "knight", "pawn"
     private boolean isWhite;
     private int positionX, positionY; // board square (0-7), not pixels
     private final List<Point> legalMoves = new ArrayList<>(); 

@@ -1,18 +1,17 @@
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 public class Board extends JPanel {
-
     private final int blockSize = 80; // Size of each block in pixels
     private final int rows = 10;
     private final int cols = 10;
     private final BufferedImage board = new BufferedImage(blockSize * cols, blockSize * rows, BufferedImage.TYPE_INT_RGB);
     private final List<ChessPiece> pieces = new ArrayList<>();
     private boolean firstClick = true;
+    private boolean whiteTurn = true;
     private ChessPiece clickedPiece;
     private ChessPiece pieceCaptured;
 
@@ -36,6 +35,16 @@ public class Board extends JPanel {
         setupPieces(); // Place every piece in its starting square
         setFocusable(true); //Focuses on window to listen for key events
 
+
+        addKeyListener(new KeyAdapter() {
+            @Override // overriding the kepressed method
+            public void keyPressed(KeyEvent e) {
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_ESCAPE -> resetBoard();
+                }
+            }
+        });
+
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -44,8 +53,16 @@ public class Board extends JPanel {
                 if (firstClick){
                     for (ChessPiece piece : pieces){
                         if (piece.getPositionX() == clickedX && piece.getPositionY() == clickedY) {
-                            clickedPiece = piece;
-                            firstClick = false;
+                            if (whiteTurn && piece.isWhite()){
+                                clickedPiece = piece;
+                                firstClick = false;
+                                whiteTurn = false;
+                            } else if (!whiteTurn && !piece.isWhite()){
+                                clickedPiece = piece;
+                                firstClick = false;
+                                whiteTurn = true;
+                            }
+                            
                         } 
                     }
                  } else if (!firstClick && clickedPiece != null){
@@ -110,6 +127,12 @@ public class Board extends JPanel {
             pieces.add(new ChessPiece("pawn", true, col, 6));        // white pawns
             pieces.add(new ChessPiece(backRow[col], true, col, 7));  // white back row
         }
+    }
+
+    private void resetBoard(){
+        pieces.clear();
+        setupPieces();
+        repaint();
     }
 
     private void drawBoard(Graphics2D g2d) {
